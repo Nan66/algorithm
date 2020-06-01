@@ -1,0 +1,72 @@
+# 6.1 打卡
+# leetcode 32
+ ```java
+/**
+*思路：动态规划的思想,dp[i]表示以char[i]结尾的最长有效字符长度
+* 方程：当当前字符为")"时，如果前一个为"(",
+*   那么dp[i] = dp[i-2]+2。
+* 当当前字符为")"时，如果前一个为")"时，
+*   那么如果char[i-dp[i-1]-1]="(",那么dp[i] = dp[i-1]+dp[i-dp[i-1]-2]+2
+*   该情况表示的是()(()())这种情景时，当i等于7时的情况。（0-7）
+* 即只有当前字符为")"时才进行dp的更新
+*/
+class Solution {
+    public int longestValidParentheses(String s) {
+        int[] dp = new int[s.length()];
+        char[] charS = s.toCharArray();
+        int max = 0;
+        for(int i = 1;i<charS.length;i++){
+            //如果当前字符为')'
+            if(charS[i]==')'){
+                //如果前一个为'('，注意数组越界的判断
+                if(charS[i-1]=='('){
+                    dp[i] = (i>=2 ? dp[i-2] : 0)+2;
+                }else{//如果前一个为')'
+                    //该条件和i表示的右括号匹配的左括号存在且在次有效括号序列中
+                    //即()(()()))),与7号位括号匹配的是2号位括号
+                    if(i-dp[i-1]>0&&charS[i-dp[i-1]-1]=='('){
+                        dp[i] =dp[i-1]+ (i-dp[i-1]>=2?dp[i-dp[i-1]-2]:0)+2;
+                    }
+                }
+            }
+            //更新最大值
+            max = Math.max(dp[i],max);
+        }
+        return max;
+    }
+}
+ ```
+
+```java
+/**
+*思路：通过栈来存储括号的位置，当遇到右括号时，弹出左括号，然后长度为右括号位置减匹配的左括号前一个位置
+*/
+class Solution {
+    public int longestValidParentheses(String s) {
+        char[] charArray = s.toCharArray();
+        Stack<Integer> stack = new Stack<>();
+        boolean judge = true;
+        int res = 0;
+        int count = 0;
+        stack.push(-1);
+        for(int i = 0;i<s.length();i++){
+            //遇到左括号，入栈
+            if(charArray[i]=='('){
+                stack.push(i);
+            }else{
+                //遇到右括号，弹出一个左括号与之匹配
+                stack.pop();
+                //如果此时为空，那么将右括号位置入栈，即之后的有效括号都是在这个括号右侧
+                //这种情况是有多余右括号时发生的
+                if(stack.isEmpty()){
+                    stack.push(i);
+                }else{
+                    //否则，求res
+                    res = Math.max(res,i-stack.peek());
+                }
+            }
+        }
+        return res;
+    }
+}
+```
