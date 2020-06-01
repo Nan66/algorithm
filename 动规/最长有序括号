@@ -1,5 +1,5 @@
 # 6.1 打卡
-# leetcode 32
+# leetcode 32.
  ```java
 /**
 *思路：动态规划的思想,dp[i]表示以char[i]结尾的最长有效字符长度
